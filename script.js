@@ -1,3 +1,6 @@
+const downloadButton=document.getElementById('download')
+
+
 // Load Monaco Editor using AMD loader
 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.32.1/min/vs' } });
 
@@ -80,6 +83,33 @@ require(['vs/editor/editor.main'], function () {
             }
         }
     });
+    downloadButton.addEventListener('click',()=>{
+        const htmlContent = htmlEditor.getValue();
+        const cssContent = cssEditor.getValue();
+        const jsContent = jsEditor.getValue();
+        const fileName=prompt('Enter Filename:(default:index.html)')
+        downloadFile(`${(fileName!==""?fileName:'index')}.html`,`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <link rel="stylesheet" href="${fileName+'_style'}.css">
+            </head>
+            <body>
+                ${htmlContent}
+                <script src="${fileName+'_script'}.js"><\/script>
+            </body>
+            </html>
+        `)
+        downloadFile(`${fileName+'_style'}.css`,cssContent)
+        downloadFile(`${fileName+'_script'}.js`,jsContent)
+    })
+    function downloadFile(file,content) {
+        const blob=new Blob([content],{type:'text/plain'})
+        const link=document.createElement('a')
+        link.href=URL.createObjectURL(blob)
+        link.download=file
+        link.click()
+    }
 });
 
 // Function for auto-closing tags
